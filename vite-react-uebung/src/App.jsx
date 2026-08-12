@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState('');
+  const [removingIndex, setRemovingIndex] = useState(null);
 
   function addTask() {
     if (input.trim() === '') return;
@@ -18,12 +19,16 @@ function App() {
   }
 
   function deleteTask(index) {
-    setTasks(tasks.filter((_, i) => i !== index));
+    setRemovingIndex(index);
+    setTimeout(() => {
+      setTasks((prev) => prev.filter((_, i) => i !== index));
+      setRemovingIndex(null);
+    }, 250); // matches the slideOut animation duration
   }
 
   return (
     <div className="todo-app">
-      <h1>To-Do List</h1>
+      <h1>📝 To-Do List</h1>
 
       <div className="input-row">
         <input
@@ -40,7 +45,10 @@ function App() {
       ) : (
         <ul className="task-list">
           {tasks.map((task, index) => (
-            <li className="task-item" key={index}>
+            <li
+              className={`task-item ${removingIndex === index ? 'removing' : ''}`}
+              key={index}
+            >
               <span
                 className={`task-text ${task.done ? 'done' : ''}`}
                 onClick={() => toggleTask(index)}
