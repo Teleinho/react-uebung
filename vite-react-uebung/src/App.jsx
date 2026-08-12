@@ -28,8 +28,8 @@ function App() {
   }
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
-      <div className="todo-app">
+  <div className={`page ${darkMode ? 'dark' : ''}`}>
+    <div className="todo-app">
         <div className="app-header">
           <h1>📝To-Do List</h1>
           <button
@@ -40,6 +40,7 @@ function App() {
             {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
+        
 
         <div className="input-row">
           <input
