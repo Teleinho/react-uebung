@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [input, setInput] = useState('');
   const [removingIndex, setRemovingIndex] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
+  // Save tasks whenever they change
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  // Save dark mode preference whenever it changes
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode);
+  }, [darkMode]);
 
   function addTask() {
     if (input.trim() === '') return;
@@ -28,10 +43,10 @@ function App() {
   }
 
   return (
-  <div className={`page ${darkMode ? 'dark' : ''}`}>
-    <div className="todo-app">
+    <div className={`page ${darkMode ? 'dark' : ''}`}>
+      <div className="todo-app">
         <div className="app-header">
-          <h1>📝To-Do List</h1>
+          <h1>📝 To-Do List</h1>
           <button
             className="theme-toggle"
             onClick={() => setDarkMode(!darkMode)}
@@ -40,7 +55,6 @@ function App() {
             {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
-        
 
         <div className="input-row">
           <input
