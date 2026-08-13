@@ -11,13 +11,13 @@ function App() {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
   });
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editText, setEditText] = useState('');
 
-  // Save tasks whenever they change
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
-  // Save dark mode preference whenever it changes
   useEffect(() => {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
@@ -40,6 +40,23 @@ function App() {
       setTasks((prev) => prev.filter((_, i) => i !== index));
       setRemovingIndex(null);
     }, 250);
+  }
+
+  function startEditing(index, currentText) {
+    setEditingIndex(index);
+    setEditText(currentText);
+  }
+
+  function saveEdit(index) {
+    const trimmed = editText.trim();
+    if (trimmed === '') {
+      setEditingIndex(null);
+      return;
+    }
+    const updated = [...tasks];
+    updated[index].text = trimmed;
+    setTasks(updated);
+    setEditingIndex(null);
   }
 
   return (
@@ -75,12 +92,24 @@ function App() {
                 className={`task-item ${removingIndex === index ? 'removing' : ''}`}
                 key={index}
               >
-                <span
-                  className={`task-text ${task.done ? 'done' : ''}`}
-                  onClick={() => toggleTask(index)}
-                >
-                  {task.text}
-                </span>
+                {editingIndex === index ? (
+                  <input
+                    className="edit-input"
+                    value={editText}
+                    autoFocus
+                    onChange={(e) => setEditText(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveEdit(index)}
+                    onBlur={() => saveEdit(index)}
+                  />
+                ) : (
+                  <span
+                    className={`task-text ${task.done ? 'done' : ''}`}
+                    onClick={() => toggleTask(index)}
+                    onDoubleClick={() => startEditing(index, task.text)}
+                  >
+                    {task.text}
+                  </span>
+                )}
                 <button className="delete-btn" onClick={() => deleteTask(index)}>
                   ❌
                 </button>
